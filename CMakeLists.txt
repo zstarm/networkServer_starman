@@ -11,15 +11,16 @@ set(CMAKE_CPP_STANDARD_REQUIRED False)
 #configure_file(HEADERNAME.h.in HEADERNAME.h)
 
 #add library/src/include subdirectories
-#add_subdirectory(src)
+add_subdirectory(src)
 
 #add executable
-add_executable(testServer ${PROJECT_SOURCE_DIR}/src/testServer.cpp ${PROJECT_SOURCE_DIR}/src/server_obj.cpp)
+add_executable(testServer ${PROJECT_SOURCE_DIR}/src/testServer.cpp)
+#target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/server_obj.cpp)
 
 #link target libraries
-#target_link_libraries(testServer PUBLIC CPPServerObject)
+target_link_libraries(testServer PRIVATE CPPServerObject)
 
 #add paths to the included header files
-target_include_directories(testServer PUBLIC "${PROJECT_SOURCE_DIR}/include")
+target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include")
 
 
