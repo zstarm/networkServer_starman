@@ -1,7 +1,7 @@
 #include "server_obj.h"
 
-void sigchld_handler(int s)
-{
+void sigchld_handler(int s) {
+
     // waitpid() might overwrite errno, so we save and restore it:
     int saved_errno = errno;
 
@@ -30,8 +30,8 @@ tcp_server::tcp_server(const char *IP, const char *PORT) : yes(1), successful_st
 tcp_server::~tcp_server() {}
 
 // get sockaddr, IPv4 or IPv6:
-void* tcp_server::get_in_addr(struct sockaddr *sa)
-{
+void* tcp_server::get_in_addr(struct sockaddr *sa) {
+
     if (sa->sa_family == AF_INET) {
         return &(((struct sockaddr_in*)sa)->sin_addr);
     }
@@ -39,20 +39,8 @@ void* tcp_server::get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-
-void tcp_server::set_addr_info(int ai_family, int ai_socktype, int ai_flags) {
-	hints.ai_family = ai_family;
-	hints.ai_socktype = ai_socktype;
-	hints.ai_flags = ai_flags;
-}
-
-
-void tcp_server::change_backlog(int backlog) {
-	BACKLOG = backlog;
-}
-
-
-void tcp_server::start_server() {
+void tcp_server::startup_procedure() {
+	successful_start = true;
 
 	if ((rv = getaddrinfo(NODE, SERVICE, &hints, &servinfo)) != 0) {
 		//std::cout << "getaddrinfo: " << gai_strerror(rv) << "\n";
@@ -102,32 +90,57 @@ void tcp_server::start_server() {
         perror("sigaction");
         exit(1);
     }
+}
 
-    printf("server: waiting for connections...\n");
 
-	while(1) {  // main accept() loop
-        sin_size = sizeof their_addr;
-        new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
-        if (new_fd == -1) {
-            perror("accept");
-            continue;
-        }
+void tcp_server::set_addr_info(int ai_family, int ai_socktype, int ai_flags) {
+	hints.ai_family = ai_family;
+	hints.ai_socktype = ai_socktype;
+	hints.ai_flags = ai_flags;
+}
 
-        inet_ntop(their_addr.ss_family,
-            get_in_addr((struct sockaddr *)&their_addr),
-            s, sizeof s);
-        printf("server: got connection from %s\n", s);
 
-        if (!fork()) { // this is the child process
-            close(sockfd); // child doesn't need the listener
-            if (send(new_fd, "Hello, world!", 13, 0) == -1)
-                perror("send");
-            close(new_fd);
-            exit(0);
-        }
-        close(new_fd);  // parent doesn't need this
-    }
+void tcp_server::change_backlog(int backlog) {
+	BACKLOG = backlog;
+}
 
+
+void tcp_server::start_server() {
+
+	startup_procedure();
+
+	if(successful_start) {
+		printf("server: waiting for connections...\n");
+
+		while(1) {  // main accept() loop
+			sin_size = sizeof their_addr;
+			new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
+			if (new_fd == -1) {
+				perror("accept");
+				continue;
+			}
+
+			inet_ntop(their_addr.ss_family,
+				get_in_addr((struct sockaddr *)&their_addr),
+				s, sizeof s);
+			printf("server: got connection from %s\n", s);
+
+			if (!fork()) { // this is the child process
+				close(sockfd); // child doesn't need the listener
+				//if (send(new_fd, "Hello, world!", 13, 0) == -1)
+				if (send(new_fd, "Hello from the server!", 22, 0) == -1) { 
+					perror("send");
+				}
+				close(new_fd);
+				exit(0);
+			}
+			close(new_fd);  // parent doesn't need this
+		}
+	}
+
+	else {
+		printf("startup unsuccessful");
+	}
 }
 
 

@@ -37,6 +37,7 @@ class tcp_server {
 		int BACKLOG;
 
 		void * get_in_addr(struct sockaddr *a);
+		void startup_procedure();
 
 	public:
 		tcp_server(const char *IP = NULL, const char *PORT = "3490");
