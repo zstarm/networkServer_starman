@@ -15,7 +15,12 @@ set(CMAKE_CPP_STANDARD_REQUIRED False)
 
 #add executable
 add_executable(testServer ${PROJECT_SOURCE_DIR}/src/testServer.cpp)
-target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/server_obj.cpp)
+
+#add additional source code dependent on OS
+if(UNIX)
+	target_compile_definitions(testServer PRIVATE "UNIX_BUILD")
+	target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/server_obj.cpp)
+endif(UNIX)
 
 #link target libraries
 #target_link_libraries(testServer PRIVATE CPPServerObject)
