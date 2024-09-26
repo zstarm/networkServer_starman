@@ -7,4 +7,4 @@ Basic TCP server and clients classes to be used later in other projects requirin
 
 ## Update: September 26, 2024
 
-Adding fucntionality to read and retrieve messages sent to sever a client
+Adding functionality to read and retrieve messages sent to sever a client
