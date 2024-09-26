@@ -2,6 +2,10 @@
 #	include "server_obj.h"
 #endif
 
+#ifdef WIN32_BUILD
+#	include "server_obj_win32.h"
+#endif
+
 #include <iostream>
 
 int main() {
@@ -11,7 +15,8 @@ int main() {
 	myServer.start_server();
 	std::cin.ignore();
 	myServer.close_server();
-	while(1) {}
+	std::cin.ignore();
+	//while(1) {}
 
 	return 0;
 }

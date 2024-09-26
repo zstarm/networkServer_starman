@@ -19,13 +19,20 @@ add_executable(testServer ${PROJECT_SOURCE_DIR}/src/testServer.cpp)
 #add additional source code dependent on OS
 if(UNIX)
 	target_compile_definitions(testServer PRIVATE "UNIX_BUILD")
-	target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/server_obj.cpp)
+	target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/linux/server_obj.cpp)
+	target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include/linux/")
 endif(UNIX)
+
+if(WIN32)
+	target_compile_definitions(testServer PRIVATE "UNIX_BUILD")
+	target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/win/server_obj.cpp)
+	target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include/win/")
+endif(WIN32)
 
 #link target libraries
 #target_link_libraries(testServer PRIVATE CPPServerObject)
 
 #add paths to the included header files
-target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include")
+#target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include")
 
 
