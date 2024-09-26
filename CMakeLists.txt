@@ -4,8 +4,8 @@ cmake_minimum_required(VERSION 3.10)
 project("Networking Server Test Project" VERSION 0.1)
 
 #C++ Standard
-set(CMAKE_CPP_STANDARD 17)
-set(CMAKE_CPP_STANDARD_REQUIRED False)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 #Configure header file to pass in CMake settings to source code
 #configure_file(HEADERNAME.h.in HEADERNAME.h)
