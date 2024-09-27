@@ -24,9 +24,10 @@ if(UNIX)
 endif(UNIX)
 
 if(WIN32)
-	target_compile_definitions(testServer PRIVATE "UNIX_BUILD")
-	target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/win/server_obj_win32.cpp)
-	target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include/win/")
+	target_compile_definitions(testServer PRIVATE "WIN32_BUILD")
+	target_sources(testServer PRIVATE ${PROJECT_SOURCE_DIR}/src/win32/server_obj_win32.cpp)
+	target_link_libraries(testServer PRIVATE ws2_32)
+	target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include/win32/")
 endif(WIN32)
 
 #link target libraries
