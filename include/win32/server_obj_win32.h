@@ -19,11 +19,14 @@
 #include <arpa/inet.h>
 #include <poll.h>
 */
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <winsock2.h>
 #include<WS2tcpip.h>
 
+#define SHUT_RDWR 2
 
-void sigchld_handler(int s);
+//void sigchld_handler(int s);
 
 class tcp_server {
 	private:
@@ -32,7 +35,7 @@ class tcp_server {
 		int ai_family, ai_socktype, ai_flag; //flags used to create server socket
     	struct sockaddr_storage their_addr; // connector's address information
 		socklen_t sin_size;
-		struct sigaction sa;
+		//struct sigaction sa;
 		char remoteIP[INET6_ADDRSTRLEN];
 		
 		int fd_count; //number of polled sockets

@@ -1,5 +1,6 @@
 #include "server_obj_win32.h"
 
+/*
 void sigchld_handler(int s) {
 
     // waitpid() might overwrite errno, so we save and restore it:
@@ -9,7 +10,7 @@ void sigchld_handler(int s) {
 
     errno = saved_errno;
 }
-
+*/
 
 tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_size(serv_size+1), NODE(IP), SERVICE(PORT) {
 	//init boolean switches for server operation	
@@ -32,8 +33,8 @@ tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_siz
 }
 
 tcp_server::~tcp_server() {
-	close(sockfd);
-	close(new_fd);
+	closesocket(sockfd);
+	closesocket(new_fd);
 	free(pfds);
 	WSACleanup();
 }
@@ -111,14 +112,14 @@ void tcp_server::startup_procedure() {
             continue;
         }
 
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)& yes,
                 sizeof(int)) == -1) {
             perror("setsockopt");
             exit(1);
         }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(sockfd);
+            closesocket(sockfd);
             perror("server: bind");
             continue;
         }
@@ -138,6 +139,7 @@ void tcp_server::startup_procedure() {
         exit(1);
     }
 
+	/*
     sa.sa_handler = sigchld_handler; // reap all dead processes
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
@@ -145,6 +147,7 @@ void tcp_server::startup_procedure() {
         perror("sigaction");
         exit(1);
     }
+	*/
 
 	//adding listener socket to set
 	pfds[0].fd = sockfd;
@@ -155,7 +158,7 @@ void tcp_server::startup_procedure() {
 
 void tcp_server::accept_new_connection() {
 	while(maintain_server) {  // main accept() loop
-		int poll_count = poll(pfds, fd_count, -1); //poll for clients events	
+		int poll_count = WSAPoll(pfds, fd_count, -1); //poll for clients events	
 		if(poll_count == -1) {
 			perror("poll");
 			break;
@@ -181,7 +184,7 @@ void tcp_server::accept_new_connection() {
 									remoteIP, new_fd);
 						}
 						else {
-							close(new_fd);
+							closesocket(new_fd);
 							printf("server: server blocked connection tried from %s on socket %d\n",
 									remoteIP, new_fd);
 						}
@@ -201,7 +204,7 @@ void tcp_server::accept_new_connection() {
 							perror("recv");
 						}
 
-						close(pfds[i].fd); 
+						closesocket(pfds[i].fd); 
 						remove_from_pfds(i);
 					}
 					else {
@@ -280,7 +283,8 @@ void tcp_server::close_server() {
 	successful_start = false;
 	//shutdown(sockfd, SHUT_RDWR);
 	for(int i = 0; i < fd_count; i++) {
-		shutdown(pfds[i].fd, SHUT_RDWR);
+		//shutdown(pfds[i].fd, SHUT_RDWR);
+		closesocket(pfds[i].fd);
 	}
 	printf("server: closed...\n");
 	worker_thread.join();
