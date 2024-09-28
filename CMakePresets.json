@@ -1,25 +1,18 @@
 {
-	"version": 1,
-	"cmakeMinimumRequired": {
-		"major": 3,
-		"minor": 10,
-		"patch": 0
-	},
-	"configurePresets": [
-		{
-			"name": "Windows",
-			"displayName": "Default Config for Windows",
-			"description": "Default build for windows using Ninja generator",
-			"generator": "Ninja",
-			"binaryDir": "${sourceDir}/build/Win32"
-		},
-		{
-			"name": "Unix",
-			"displayName": "Default Config for Unix",
-			"description": "Default build for unix using makefiles",
-			"generator": "Unix Makefiles",
-			"binaryDir": "${sourceDir}/build/Unix"
-		}
-		
-	]
+  "version": 2,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build using Ninja generator",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/default"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    }
+  ]
 }
