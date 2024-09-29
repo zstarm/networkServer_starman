@@ -14,6 +14,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #add_subdirectory(src)
 
 #add executable
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/../")
 add_executable(testServer ${PROJECT_SOURCE_DIR}/src/testServer.cpp)
 
 #add additional source code dependent on OS
@@ -29,6 +30,7 @@ if(WIN32)
 	target_link_libraries(testServer PRIVATE ws2_32)
 	target_include_directories(testServer PRIVATE "${PROJECT_SOURCE_DIR}/include/win32/")
 endif(WIN32)
+
 
 #link target libraries
 #target_link_libraries(testServer PRIVATE CPPServerObject)
