@@ -209,6 +209,7 @@ void tcp_server::accept_new_connection() {
 					}
 					else {
 						//do something with client data
+						printf("%s", &buf[0]);
 					}
 				}
 			}

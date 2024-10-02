@@ -190,6 +190,7 @@ void tcp_server::accept_new_connection() {
 					}
 					else {
 						//do something with client data
+						printf("%s", &buf[0]);
 					}
 				}
 			}
@@ -258,6 +259,7 @@ void tcp_server::start_server() {
 		printf("startup unsuccessful");
 	}
 }
+
 
 void tcp_server::close_server() {
 	maintain_server = false;
