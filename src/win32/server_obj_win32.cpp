@@ -164,6 +164,7 @@ void tcp_server::accept_new_connection() {
 			break;
 		}
 
+
 		for(int i = 0; i < fd_count; i++) {
 			if(pfds[i].revents & POLLIN) {
 				//client data incoming
@@ -206,11 +207,27 @@ void tcp_server::accept_new_connection() {
 
 						closesocket(pfds[i].fd); 
 						remove_from_pfds(i);
+						printf("nbytes: %d\n", nbytes);
 					}
 					else {
 						//do something with client data
-						printf("%s", &buf[0]);
+						//printf("%s", &buf);
 					}
+				}
+			}
+			else {
+				//non-POLLIN hangup
+				if(pfds[i].fd != sockfd) {
+					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
+					int sender_fd = pfds[i].fd;
+					if(nbytes == 0) {
+						printf("server: client on socket %d hung up\n", sender_fd);
+					}
+					else {
+						perror("recv");
+					}
+					closesocket(pfds[i].fd); 
+					remove_from_pfds(i);
 				}
 			}
 		}
