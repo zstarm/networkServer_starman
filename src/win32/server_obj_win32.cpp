@@ -67,7 +67,11 @@ int tcp_server::add_to_pfds() {
 
 void tcp_server::remove_from_pfds(int i) {
 	pfds[i] = pfds[fd_count - 1];
-	fd_count--;
+	if(i == (fd_count-1)) {
+		pfds[i].events = POLLIN;
+	}
+	--fd_count;
+	//
 }
 
 void tcp_server::WSA_startup() {
@@ -164,9 +168,9 @@ void tcp_server::accept_new_connection() {
 			break;
 		}
 
-
 		for(int i = 0; i < fd_count; i++) {
 			if(pfds[i].revents & POLLIN) {
+				printf("revent for POLLIN %d\n", POLLIN);
 				//client data incoming
 				if(pfds[i].fd == sockfd) {
 					//listener recieved a new client connection
@@ -215,7 +219,9 @@ void tcp_server::accept_new_connection() {
 					}
 				}
 			}
-			else {
+			else if (pfds[i].revents & POLLHUP){
+				printf("revent for socket %d: %d\n", pfds[i].fd, pfds[i].revents);
+				printf("revent for POLLHUP %d\n", POLLHUP);
 				//non-POLLIN hangup
 				if(pfds[i].fd != sockfd) {
 					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
