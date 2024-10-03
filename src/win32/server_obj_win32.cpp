@@ -68,7 +68,7 @@ int tcp_server::add_to_pfds() {
 void tcp_server::remove_from_pfds(int i) {
 	pfds[i] = pfds[fd_count - 1];
 	if(i == (fd_count-1)) {
-		pfds[i].events = POLLIN;
+		pfds[i].revents = 0; //reset the revents if at the end
 	}
 	--fd_count;
 	//
@@ -157,6 +157,7 @@ void tcp_server::startup_procedure() {
 	pfds[0].fd = sockfd;
 	pfds[0].events = POLLIN; //reports for incoming connections
 	fd_count++; //increase polled socket count for listener
+
 }
 
 
@@ -170,7 +171,6 @@ void tcp_server::accept_new_connection() {
 
 		for(int i = 0; i < fd_count; i++) {
 			if(pfds[i].revents & POLLIN) {
-				printf("revent for POLLIN %d\n", POLLIN);
 				//client data incoming
 				if(pfds[i].fd == sockfd) {
 					//listener recieved a new client connection
@@ -211,17 +211,15 @@ void tcp_server::accept_new_connection() {
 
 						closesocket(pfds[i].fd); 
 						remove_from_pfds(i);
-						printf("nbytes: %d\n", nbytes);
 					}
 					else {
 						//do something with client data
-						//printf("%s", &buf);
+						printf("%s", &buf[0]);
 					}
 				}
 			}
-			else if (pfds[i].revents & POLLHUP){
-				printf("revent for socket %d: %d\n", pfds[i].fd, pfds[i].revents);
-				printf("revent for POLLHUP %d\n", POLLHUP);
+			
+			else if (pfds[i].revents & POLLHUP) {
 				//non-POLLIN hangup
 				if(pfds[i].fd != sockfd) {
 					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
