@@ -12,7 +12,7 @@ void sigchld_handler(int s) {
 }
 */
 
-tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_size(serv_size+1), NODE(IP), SERVICE(PORT) {
+tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_size(serv_size+1), NODE(IP), SERVICE(PORT), buf("\0") {
 	//init boolean switches for server operation	
 	successful_start = false;
 	maintain_server = false;
@@ -30,6 +30,7 @@ tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_siz
 	}
 	pfds = (pollfd*)malloc(sizeof *pfds * fd_size); //allocate room to poll max amount of client connections
 	fd_count = 0; //server has initially zero connections and no listener socket 
+
 }
 
 tcp_server::~tcp_server() {
@@ -214,6 +215,9 @@ void tcp_server::accept_new_connection() {
 					}
 					else {
 						//do something with client data
+						if (nbytes < 256) {
+							buf[nbytes] = '\0'; //add NULL terminator to signify the end of client message
+						} 
 						printf("%s", &buf[0]);
 					}
 				}
