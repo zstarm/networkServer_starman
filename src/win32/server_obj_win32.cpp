@@ -12,6 +12,7 @@ void sigchld_handler(int s) {
 }
 */
 
+
 tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_size(serv_size+1), NODE(IP), SERVICE(PORT), buf("\0") {
 	//init boolean switches for server operation	
 	successful_start = false;
@@ -33,12 +34,14 @@ tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_siz
 
 }
 
+
 tcp_server::~tcp_server() {
 	closesocket(sockfd);
 	closesocket(new_fd);
 	free(pfds);
 	WSACleanup();
 }
+
 
 // get sockaddr, IPv4 or IPv6:
 void* tcp_server::get_in_addr(struct sockaddr *sa) {
@@ -49,6 +52,7 @@ void* tcp_server::get_in_addr(struct sockaddr *sa) {
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
+
 
 int tcp_server::add_to_pfds() {
 	if(fd_count == fd_size) {
@@ -75,6 +79,7 @@ void tcp_server::remove_from_pfds(int i) {
 	//
 }
 
+
 void tcp_server::WSA_startup() {
 
 	if(WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -88,6 +93,7 @@ void tcp_server::WSA_startup() {
 		exit(2);
 	}
 }
+
 
 void tcp_server::startup_procedure() {
 	successful_start = true;
