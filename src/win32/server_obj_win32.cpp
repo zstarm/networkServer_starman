@@ -204,7 +204,7 @@ void tcp_server::accept_new_connection() {
 					}
 				}
 				else { //not the listener socket
-					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
+					int nbytes = recv(pfds[i].fd, &buf[0], sizeof buf, 0);
 					int sender_fd = pfds[i].fd;
 
 					if(nbytes <= 0) {
@@ -232,7 +232,7 @@ void tcp_server::accept_new_connection() {
 			else if (pfds[i].revents & POLLHUP) {
 				//non-POLLIN hangup
 				if(pfds[i].fd != sockfd) {
-					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
+					int nbytes = recv(pfds[i].fd, &buf[0], sizeof buf, 0);
 					int sender_fd = pfds[i].fd;
 					if(nbytes == 0) {
 						printf("server: client on socket %d hung up\n", sender_fd);

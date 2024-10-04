@@ -176,7 +176,7 @@ void tcp_server::accept_new_connection() {
 					}
 				}
 				else { //not the listener socket
-					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
+					int nbytes = recv(pfds[i].fd, &buf[0], sizeof buf, 0);
 					int sender_fd = pfds[i].fd;
 
 					if(nbytes <= 0) {

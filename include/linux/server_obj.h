@@ -1,7 +1,8 @@
 #ifndef SERVER_OBJ
 #define SERVER_OBJ
 
-//#include <iostream>
+#include <array>
+
 #include <thread>
 #include <cstdio>
 #include <string>
@@ -32,7 +33,7 @@ class tcp_server {
 		int fd_count; //number of polled sockets
 		int fd_size; //number of simultaneous clients
 		struct pollfd *pfds; //array to hold sockets of connected clients
-		char buf[256]; //buffer for client data
+		std::array<char, 256> buf; //buffer for client data
 
 		bool successful_start;
 		bool server_full;
