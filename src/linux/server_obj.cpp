@@ -29,11 +29,13 @@ tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_siz
 	fd_count = 0; //server has initially zero connections and no listener socket 
 }
 
+
 tcp_server::~tcp_server() {
 	close(sockfd);
 	close(new_fd);
 	free(pfds);
 }
+
 
 // get sockaddr, IPv4 or IPv6:
 void* tcp_server::get_in_addr(struct sockaddr *sa) {
@@ -44,6 +46,7 @@ void* tcp_server::get_in_addr(struct sockaddr *sa) {
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
+
 
 int tcp_server::add_to_pfds() {
 	if(fd_count == fd_size) {
@@ -190,6 +193,10 @@ void tcp_server::accept_new_connection() {
 					}
 					else {
 						//do something with client data
+						if (nbytes < 256) {
+							buf[nbytes] = '\0'; //add NULL terminator to signify the end of client message
+						} 
+						printf("%s", &buf[0]);
 					}
 				}
 			}
@@ -258,6 +265,7 @@ void tcp_server::start_server() {
 		printf("startup unsuccessful");
 	}
 }
+
 
 void tcp_server::close_server() {
 	maintain_server = false;

@@ -9,7 +9,7 @@
 #include <iostream>
 
 int main() {
-	tcp_server myServer(2);
+	tcp_server myServer(2, NULL, "56565");
 
 	//myServer.set_addr_info(AI_PASSIVE, SOCK_STREAM, AF_UNSPEC); //testing error handling
 	myServer.start_server();

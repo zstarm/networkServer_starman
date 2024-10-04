@@ -12,7 +12,8 @@ void sigchld_handler(int s) {
 }
 */
 
-tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_size(serv_size+1), NODE(IP), SERVICE(PORT) {
+
+tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_size(serv_size+1), NODE(IP), SERVICE(PORT), buf("\0") {
 	//init boolean switches for server operation	
 	successful_start = false;
 	maintain_server = false;
@@ -30,7 +31,9 @@ tcp_server::tcp_server(int serv_size, const char *IP, const char *PORT) : fd_siz
 	}
 	pfds = (pollfd*)malloc(sizeof *pfds * fd_size); //allocate room to poll max amount of client connections
 	fd_count = 0; //server has initially zero connections and no listener socket 
+
 }
+
 
 tcp_server::~tcp_server() {
 	closesocket(sockfd);
@@ -38,6 +41,7 @@ tcp_server::~tcp_server() {
 	free(pfds);
 	WSACleanup();
 }
+
 
 // get sockaddr, IPv4 or IPv6:
 void* tcp_server::get_in_addr(struct sockaddr *sa) {
@@ -48,6 +52,7 @@ void* tcp_server::get_in_addr(struct sockaddr *sa) {
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
+
 
 int tcp_server::add_to_pfds() {
 	if(fd_count == fd_size) {
@@ -67,8 +72,13 @@ int tcp_server::add_to_pfds() {
 
 void tcp_server::remove_from_pfds(int i) {
 	pfds[i] = pfds[fd_count - 1];
-	fd_count--;
+	if(i == (fd_count-1)) {
+		pfds[i].revents = 0; //reset the revents if at the end
+	}
+	--fd_count;
+	//
 }
+
 
 void tcp_server::WSA_startup() {
 
@@ -83,6 +93,7 @@ void tcp_server::WSA_startup() {
 		exit(2);
 	}
 }
+
 
 void tcp_server::startup_procedure() {
 	successful_start = true;
@@ -153,6 +164,7 @@ void tcp_server::startup_procedure() {
 	pfds[0].fd = sockfd;
 	pfds[0].events = POLLIN; //reports for incoming connections
 	fd_count++; //increase polled socket count for listener
+
 }
 
 
@@ -209,7 +221,27 @@ void tcp_server::accept_new_connection() {
 					}
 					else {
 						//do something with client data
+						if (nbytes < 256) {
+							buf[nbytes] = '\0'; //add NULL terminator to signify the end of client message
+						} 
+						printf("%s", &buf[0]);
 					}
+				}
+			}
+			
+			else if (pfds[i].revents & POLLHUP) {
+				//non-POLLIN hangup
+				if(pfds[i].fd != sockfd) {
+					int nbytes = recv(pfds[i].fd, buf, sizeof buf, 0);
+					int sender_fd = pfds[i].fd;
+					if(nbytes == 0) {
+						printf("server: client on socket %d hung up\n", sender_fd);
+					}
+					else {
+						perror("recv");
+					}
+					closesocket(pfds[i].fd); 
+					remove_from_pfds(i);
 				}
 			}
 		}
